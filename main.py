@@ -60,7 +60,7 @@ data = {
     'mail': []
 }
 
-for state in statesList[0:1]:
+for state in statesList:
     peopleList = []
     for i in range(5):
         try:
@@ -87,6 +87,7 @@ for state in statesList[0:1]:
                         index_ = allText.index(line)
                         clinicName = allText[index_+1]
                         address = allText[index_+2] +""+ allText[index_+3]
+                        
                         phone = allText[index_+4]
                         mail = None
                         if "@" in allText[index_+5]:
