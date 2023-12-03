@@ -1,5 +1,5 @@
-
 ## Importing libraries
+import pandas as pd
 import requests, re, time
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -52,8 +52,15 @@ for state in states:
 
 
 
+data = {
+    'doctor_name': [],
+    'clinic_name': [],
+    'address': [],
+    'phone': [],
+    'mail': []
+}
 
-for state in statesList:
+for state in statesList[0:1]:
     peopleList = []
     for i in range(5):
         try:
@@ -73,8 +80,10 @@ for state in statesList:
                 name = soup.find("h1", {"data-hook": "product-title"}).text.split("-")[0]
                 text = soup.find("pre", {"data-hook":"description"})
                 allText = text.get_text(separator='\n').split("\n")
+                # print(allText)
                 for line in allText:
-                    if line.startswith("Contact info:"):
+                    # print(line)
+                    if line.lower().startswith("contact info"):
                         index_ = allText.index(line)
                         clinicName = allText[index_+1]
                         address = allText[index_+2] +""+ allText[index_+3]
@@ -82,13 +91,31 @@ for state in statesList:
                         mail = None
                         if "@" in allText[index_+5]:
                             mail = allText[index_+5]
+                            
                 print("Doctor Name:", name)
                 print("Clinic Name:", clinicName)
                 print("Address:", address)
                 print("Phone:", phone)
                 print("Mail:", mail)
+                new_data = {
+                        'doctor_name': name,
+                        'clinic_name': clinicName,
+                        'address': address,
+                        'phone': phone,
+                        'mail': mail
+                    }
+                for key, value in new_data.items():
+                    data[key].append(value)
                 print("-"*50)
                 time.sleep(0.1)
-            except:
+            except Exception as e:
+                print(e)
                 pass
+driver.quit()
+df = pd.DataFrame(data)
+excel_file_path = 'doctors_data.xlsx'
 
+# Save the DataFrame to an Excel file
+df.to_excel(excel_file_path, index=False)
+
+print(f'Data saved to {excel_file_path}')
